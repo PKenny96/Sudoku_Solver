@@ -1,0 +1,164 @@
+import time
+class Sudoku:
+
+    def __init__(self, lst81):
+        while len(lst81)!= 81:
+            lst81= input("There was an error in your input, please try again or enter no to stop")
+
+        self.row1 = lst81[:9]           #this takes the list and puts them into 9 rows of nine and also the nine boxes found in sudoku's
+        self.row2 = lst81[9:18]
+        self.row3 = lst81[18:27]        #probably a better way of doing this, but it was faster for me to copy/paste then spend the couple of minutes coming up with a method
+        self.row4 = lst81[27:36]
+        self.row5 = lst81[36:45]
+        self.row6 = lst81[45:54]
+        self.row7 = lst81[54:63]
+        self.row8 = lst81[63:72]
+        self.row9 = lst81[72:81]
+        self.rows = [self.row1,self.row2,self.row3,self.row4,self.row5,self.row6,self.row7,self.row8,self.row9]
+        self.box1 = self.row1[:3]+self.row2[:3]+self.row3[:3]
+        self.box2 = self.row1[3:6]+self.row2[3:6]+self.row3[3:6]
+        self.box3 = self.row1[6:9]+self.row2[6:9]+self.row3[6:9]
+        self.box4 = self.row4[:3]+self.row5[:3]+self.row6[:3]
+        self.box5 = self.row4[3:6]+self.row5[3:6]+self.row6[3:6]
+        self.box6 = self.row4[6:9]+self.row5[6:9]+self.row6[6:9]
+        self.box7 = self.row7[:3]+self.row8[:3]+self.row9[:3]
+        self.box8 = self.row7[3:6]+self.row8[3:6]+self.row9[3:6]
+        self.box9 = self.row7[6:9]+self.row8[6:9]+self.row9[6:9]
+        self.boxes = [self.box1,self.box2,self.box3,self.box4,self.box5,self.box6,self.box7,self.box8,self.box9]
+    def update(self, lst81):       #if a change was made to a specific row, updates everything else, very situationally useful
+        self.row1 = lst81[:9]           
+        self.row2 = lst81[9:18]
+        self.row3 = lst81[18:27]
+        self.row4 = lst81[27:36]
+        self.row5 = lst81[36:45]
+        self.row6 = lst81[45:54]
+        self.row7 = lst81[54:63]
+        self.row8 = lst81[63:72]
+        self.row9 = lst81[72:81]        
+        self.rows = [self.row1,self.row2,self.row3,self.row4,self.row5,self.row6,self.row7,self.row8,self.row9]
+        self.box1 = self.row1[:3]+self.row2[:3]+self.row3[:3]
+        self.box2 = self.row1[3:6]+self.row2[3:6]+self.row3[3:6]
+        self.box3 = self.row1[6:9]+self.row2[6:9]+self.row3[6:9]
+        self.box4 = self.row4[:3]+self.row5[:3]+self.row6[:3]
+        self.box5 = self.row4[3:6]+self.row5[3:6]+self.row6[3:6]
+        self.box6 = self.row4[6:9]+self.row5[6:9]+self.row6[6:9]
+        self.box7 = self.row7[:3]+self.row8[:3]+self.row9[:3]
+        self.box8 = self.row7[3:6]+self.row8[3:6]+self.row9[3:6]
+        self.box9 = self.row7[6:9]+self.row8[6:9]+self.row9[6:9]
+        self.boxes = [self.box1,self.box2,self.box3,self.box4,self.box5,self.box6,self.box7,self.box8,self.box9]
+        
+    def __str__(self):      #used all of my ASCII art skills for this
+        count = 0
+        board = ''
+        for row in range(len(self.rows)):
+            if row %3 == 0:
+                board +=' '
+                board+=("-"*23) #makes the top and bottum of the boxes
+                board +='\n'
+            board+='| ' #makes the sides of the boxes
+            for pos in range(len(self.rows[row])):
+                board+=(str(self.rows[row][pos]))+' '
+                if pos%3 == 2:
+                    board+=('| ')
+            
+
+                
+            board +='\n'
+        board+=(" ")
+        board+=("-"*23)
+        return board
+
+    def error_check_cr(self):
+
+        for first in range(9): #first is referenced for both the rows and columns, it refers to the row or column being tested 
+            test_row = []
+            test_column = []
+            for second in range(9):
+
+                if int(self.rows[first][second]) in test_row or int(self.rows[second][first]) in test_column: #if there is a duplicate in the row or column, it flags here and makes the function return false
+                    return False
+                else:
+                    if int(self.rows[first][second]) != 0:
+                        test_row.append(int(self.rows[first][second])) #goes through each value in the 'first' row and column and adds them to temporary lists, which is used to check for duplicates
+                    if int(self.rows[second][first]) != 0:
+                        test_column.append(int(self.rows[second][first]))
+                    
+        return True
+
+    def error_check_box(self):      #uses same process as error_check_cr 
+        check_box = [1,2,3,4,5,6,7,8,9]
+        for box in self.boxes:
+            test_box = []                  ## **NEED TO DO: MERGE INTO ONE ERROR CHECK**
+            for num in range(9):
+                if int(box[num]) in test_box:
+                    return False
+                else:
+                    if int(box[num]) != 0:
+                        test_box.append(int(box[num]))
+
+        return True
+            
+    def row(self, num):
+        """
+        takes a position on the Sudoku and returns the members of the row in which the position resides (in a list) DOES Include itself
+        """
+        return self.rows[num//9] 
+
+    def column(self, num):
+        """
+        takes a position and returns the members of the column in which the position resides (in a list) DOES Include itself
+        """
+        column_num = num%9     #each column in the sudoku returns the same value for it's position % 9 (returns 0 if first, 1 if second and so on)
+        column = []
+        for row in self.rows:
+            column.append(row[column_num])  #iterates through each row, adding the value in the column number of the given position
+
+        return column
+    def box(self, num):
+        """
+        takes a position and returns the members of the box in which the position resides DOES Include itself
+        """
+        if num < 27:
+            if num% 9 <3:
+                answer = 0
+            elif num%9 <6:
+                answer = 1
+            else:
+                answer = 2
+        elif num <54:
+            if num% 9 <3:
+                answer = 3
+            elif num%9 <6:
+                answer = 4
+            else:
+                answer = 5
+        else:
+            if num% 9 <3:
+                answer = 6
+            elif num%9 <6:
+                answer = 7
+            else:
+                answer = 8
+        return self.boxes[answer]
+    
+lst = [5,3,4,6,7,8,9,1,2,6,7,2,1,9,5,3,4,8,1,9,8,3,4,2,5,6,7,8,5,9,7,6,1,4,2,3,4,2,6,8,5,3,7,9,1,7,1,3,9,2,4,8,5,6,9,6,1,5,3,7,2,8,4,2,8,7,4,1,9,6,3,5,3,4,5,2,8,6,1,7,9]
+x = Sudoku(lst)
+##print(x)
+##print(x.error_check_cr())
+start = time.clock()
+x.error_check_cr()
+y = time.clock()-start
+
+start2 = time.clock()
+sums=0
+
+z = time.clock()-start2
+
+
+
+
+
+
+    
+                    
+                
